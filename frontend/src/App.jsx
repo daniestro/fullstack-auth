@@ -48,32 +48,43 @@ function SubmitButton({ children, disabled }) {
   )
 }
 
-function AuthForm() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+export async function login({ email, password }) {
+  const res = await fetch('/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  })
+  if (!res.ok) throw new Error(`Login failed: ${res.status}`)
+  return res.json()
+}
+
+export function useLogin() {
   const [error, setError] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const submit = async (credentials) => {
     setError(null)
     setIsSubmitting(true)
     try {
-      const res = await fetch('/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
-      if (!res.ok) {
-        throw new Error(`Login failed: ${res.status}`)
-      }
-      const data = await res.json()
-      console.log('Server response:', data)
+      return await login(credentials)
     } catch (err) {
       setError(err.message)
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  return { submit, error, isSubmitting }
+}
+
+function AuthForm() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const { submit, error, isSubmitting } = useLogin()
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    submit({ email, password })
   }
 
   return (
