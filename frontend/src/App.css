@@ -30,32 +30,33 @@
   font: inherit;
 }
 
+.password-block .auth-form__input {
+  padding-right: 36px;
+}
+
 .auth-form__input:focus {
   outline: none;
   border-color: #2a90e2;
 }
 
 .password-block {
-  display: flex;
-  gap: 8px;
-  align-items: end;
-}
-
-.password-block .auth-form__field {
-  flex: 1;
+  position: relative;
 }
 
 .password-block__toggle {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: white;
-  font: inherit;
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  padding: 4px;
+  border: none;
+  background: transparent;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 .password-block__toggle:hover {
-  background: #f5f5f5;
+  opacity: 0.7;
 }
 
 .auth-form__submit {
