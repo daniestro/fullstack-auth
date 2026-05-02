@@ -40,24 +40,50 @@ function PasswordBlock({ value, onChange }) {
   )
 }
 
-function SubmitButton({ children }) {
-  return <button className="auth-form__submit" type="submit">{children}</button>
+function SubmitButton({ children, disabled }) {
+  return (
+    <button className="auth-form__submit" type="submit" disabled={disabled}>
+      {children}
+    </button>
+  )
 }
 
 function AuthForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('Login:', { email, password })
+    setError(null)
+    setIsSubmitting(true)
+    try {
+      const res = await fetch('/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      if (!res.ok) {
+        throw new Error(`Login failed: ${res.status}`)
+      }
+      const data = await res.json()
+      console.log('Server response:', data)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="auth-form">
       <TextInput label="Email" type="email" value={email} onChange={setEmail} />
       <PasswordBlock value={password} onChange={setPassword} />
-      <SubmitButton>Sign in</SubmitButton>
+      <SubmitButton disabled={isSubmitting}>
+        {isSubmitting ? 'Signing in...' : 'Sign in'}
+      </SubmitButton>
+      {error && <p className="auth-form__error">{error}</p>}
     </form>
   )
 }
